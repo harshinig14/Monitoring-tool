@@ -1,0 +1,11 @@
+{
+  "collection_interval_seconds": 15,
+  "trace_directory": "traces",
+  "enable_cpu": true,
+  "enable_memory": true,
+  "enable_disk": true,
+  "enable_network": true,
+  "enable_ports": true,
+  "enable_io": true,
+  "enable_process_monitoring": true
+}
