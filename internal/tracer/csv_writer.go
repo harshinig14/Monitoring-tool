@@ -6,10 +6,18 @@ import (
 
 const TraceDirectory = "traces"
 
-func ensureTraceDirectory() error {
+func createTraceFile() {
 
-	return os.MkdirAll(TraceDirectory, os.ModePerm)
+	err := os.MkdirAll("traces", 0755)
+	if err != nil {
+		panic(err)
+	}
+
 }
+	func ensureTraceDirectory() error {
+
+		return os.MkdirAll(TraceDirectory, os.ModePerm)
+	}
 
 func fileExists(path string) bool {
 

@@ -8,8 +8,9 @@ import (
 	"syscall"
 	"time"
 	"MONITORING-TOOL/internal/collector"
-	"MONITORING-TOOL/internal/tracer"
 	"MONITORING-TOOL/internal/models"
+	"MONITORING-TOOL/internal/tracer"
+	"MONITORING-TOOL/internal/client"
 )
 
 func main() {
@@ -43,10 +44,37 @@ func main() {
 
 	log.Println("Hostname:", hostname)
 
-	config, err := models.LoadConfig("config/config.json")
-if err != nil {
-	panic(err)
-}
+	config, err := models.LoadConfig("config.json")
+	if err != nil {
+		log.Println("config.json not found or error loading, using defaults:", err)
+		config = &models.Config{
+			ServerURL:                 "http://localhost:8081",
+			CollectionIntervalSeconds: 60,
+			UserID:                    0,
+			EnableCPU:                 true,
+			EnableMemory:              true,
+			EnableDisk:                true,
+			EnableNetwork:             true,
+		}
+	}
+
+	// Phase 4: Device Registration
+	if config.UserID == 0 {
+		log.Println("UserID is 0. Attempting to register device with backend...")
+		userID, err := client.RegisterDevice(config.ServerURL)
+		if err != nil {
+			log.Fatalf("Failed to register device: %v", err)
+		}
+		log.Printf("Device registered successfully! UserID: %d\n", userID)
+		
+		config.UserID = userID
+		err = models.SaveConfig("config.json", config)
+		if err != nil {
+			log.Printf("Failed to save config.json: %v\n", err)
+		}
+	} else {
+		log.Printf("Device already registered. UserID: %d\n", config.UserID)
+	}
 
 	interval := time.Duration(config.CollectionIntervalSeconds) * time.Second
 
@@ -68,7 +96,7 @@ if err != nil {
 
 		case <-ticker.C:
 
-			runCollectionCycle()
+			runCollectionCycle(config)
 
 		case sig := <-signals:
 
@@ -84,7 +112,7 @@ if err != nil {
 	}
 }
 
-func runCollectionCycle() {
+func runCollectionCycle(config *models.Config) {
 
 	defer recoverPanic()
 
@@ -104,10 +132,22 @@ func runCollectionCycle() {
 	err = tracer.BufferedWriteMetrics(metrics)
 	if err != nil {
 		log.Println("csv write error:", err)
-		return
+		// continue even if CSV fails
+	} else {
+		log.Println("metrics buffered successfully (CSV)")
 	}
 
-	log.Println("metrics buffered successfully")
+	// Send to Backend API
+	err = client.SendMetrics(metrics, config)
+	if err != nil {
+		log.Println("metrics upload failed:", err)
+	}
+
+	// Send Heartbeat
+	err = client.SendHeartbeat(config.UserID, config.ServerURL)
+	if err != nil {
+		log.Println("heartbeat failed:", err)
+	}
 }
 
 func recoverPanic() {
