@@ -1,0 +1,101 @@
+<div class="reports-page-container">
+  <!-- Page Hero Header -->
+  <div class="page-hero-header">
+    <div class="header-text-area">
+      <h2 class="hero-title">Historical Audit Reports</h2>
+      <p class="hero-subtitle">Sieve through hardware average graphs and export spreadsheets detailing systemic performance baselines.</p>
+    </div>
+  </div>
+
+  <!-- Segment Filter Tabs -->
+  <div class="history-tab-bar">
+    <button class="tab-btn" [class.active]="activeTab === 'daily'" (click)="changeTab('daily')">Daily Report</button>
+    <button class="tab-btn" [class.active]="activeTab === 'weekly'" (click)="changeTab('weekly')">Weekly Report</button>
+    <button class="tab-btn" [class.active]="activeTab === 'monthly'" (click)="changeTab('monthly')">Monthly Report</button>
+  </div>
+
+  <!-- Utilization Averages Deck -->
+  <div class="grid col-gap-4 row-gap-4 mt-3">
+    <!-- CPU Averages -->
+    <div class="col-12 sm:col-6 lg:col-3">
+      <div class="avg-metric-card border-cyan">
+        <span class="card-label">AVG CPU UTILIZATION</span>
+        <span class="card-value value-cyan">{{ avgCpu }}%</span>
+      </div>
+    </div>
+
+    <!-- Memory Averages -->
+    <div class="col-12 sm:col-6 lg:col-3">
+      <div class="avg-metric-card border-green">
+        <span class="card-label">AVG MEMORY OCCUPANCY</span>
+        <span class="card-value value-green">{{ avgMem }}%</span>
+      </div>
+    </div>
+
+    <!-- Disk Averages -->
+    <div class="col-12 sm:col-6 lg:col-3">
+      <div class="avg-metric-card border-yellow">
+        <span class="card-label">AVG DISK CAPACITY</span>
+        <span class="card-value value-yellow">{{ avgDisk }}%</span>
+      </div>
+    </div>
+
+    <!-- Network Averages -->
+    <div class="col-12 sm:col-6 lg:col-3">
+      <div class="avg-metric-card border-purple">
+        <span class="card-label">AVG NET BANDWIDTH</span>
+        <span class="card-value value-purple">{{ avgNet }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Large Consolidated Usage Trend Card -->
+  <div class="consolidated-chart-card mt-4">
+    <div class="card-header-actions">
+      <h3 class="chart-title">
+        @if (activeTab === 'daily') { Daily } @else if (activeTab === 'weekly') { Weekly } @else { Monthly } Consolidated Usage Trend
+      </h3>
+      <button pButton type="button" icon="pi pi-download" label="Download CSV" class="p-button-outlined p-button-cyan csv-dl-btn" (click)="downloadCSV()"></button>
+    </div>
+    
+    <div class="chart-container-box mt-3">
+      <canvas baseChart
+              [datasets]="chartDatasets"
+              [labels]="chartLabels"
+              [options]="chartOptions"
+              [legend]="true"
+              type="bar">
+      </canvas>
+    </div>
+  </div>
+
+  <!-- Report Log Table Card -->
+  <div class="report-table-card mt-4">
+    <h3 class="table-card-title">
+      @if (activeTab === 'daily') { Daily } @else if (activeTab === 'weekly') { Weekly } @else { Monthly } Report Log
+    </h3>
+    
+    <div class="table-wrapper-box mt-3">
+      <p-table [value]="currentLogs" responsiveLayout="scroll" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Period</th>
+            <th>Avg CPU</th>
+            <th>Avg Memory</th>
+            <th>Avg Disk</th>
+            <th>Avg Network</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-log>
+          <tr>
+            <td><span class="period-text">{{ log.period }}</span></td>
+            <td><span class="val-text">{{ log.avgCpu }}</span></td>
+            <td><span class="val-text">{{ log.avgMem }}</span></td>
+            <td><span class="val-text">{{ log.avgDisk }}</span></td>
+            <td><span class="val-text">{{ log.avgNet }}</span></td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+</div>

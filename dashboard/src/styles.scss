@@ -1,0 +1,256 @@
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+
+/* Import Modern Typography from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --app-bg-dark: #08090d;
+  --app-sidebar-bg: #0d0f15;
+  --app-sidebar-border: #161a24;
+  --app-card-bg: #141722;
+  --app-card-border: #1e2433;
+  --app-cyan: #00d2ff;
+  --app-cyan-hover: #00b0d6;
+  --app-green: #00e676;
+  --app-red: #ff3d00;
+  --app-yellow: #ff9100;
+  --app-purple: #af40ff;
+  --app-text-main: #f5f6f8;
+  --app-text-muted: #7d8b9b;
+  
+  font-family: 'Inter', sans-serif;
+  color: var(--app-text-main);
+  background-color: var(--app-bg-dark);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--app-bg-dark);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Custom Scrollbar for Dark Mode */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--app-bg-dark);
+}
+::-webkit-scrollbar-thumb {
+  background: #252b3d;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #39425c;
+}
+
+/* Premium Styling Overrides */
+.p-component {
+  font-family: 'Inter', sans-serif !important;
+}
+
+/* Dropdown Premium Dark Styling */
+.p-dropdown {
+  background: #1a1e2d !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-radius: 6px !important;
+  color: var(--app-text-main) !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  
+  &:not(.p-disabled).p-focus {
+    border-color: var(--app-cyan) !important;
+    box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.15) !important;
+  }
+}
+.p-dropdown-panel {
+  background: #141722 !important;
+  border: 1px solid var(--app-card-border) !important;
+  
+  .p-dropdown-items {
+    padding: 0.5rem 0 !important;
+    
+    .p-dropdown-item {
+      color: var(--app-text-main) !important;
+      padding: 0.75rem 1.25rem !important;
+      
+      &:not(.p-highlight):not(.p-disabled):hover {
+        background: #1f2436 !important;
+        color: var(--app-cyan) !important;
+      }
+      
+      &.p-highlight {
+        background: rgba(0, 210, 255, 0.15) !important;
+        color: var(--app-cyan) !important;
+      }
+    }
+  }
+}
+
+/* Table Premium Dark Styling */
+.p-datatable {
+  .p-datatable-thead > tr > th {
+    background: #141722 !important;
+    color: var(--app-text-muted) !important;
+    border-bottom: 1px solid #1f2538 !important;
+    font-weight: 600 !important;
+    font-size: 0.85rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 1rem 1.25rem !important;
+  }
+  
+  .p-datatable-tbody > tr {
+    background: #141722 !important;
+    color: var(--app-text-main) !important;
+    border-bottom: 1px solid #1a1e2d !important;
+    transition: background-color 0.2s;
+    cursor: pointer;
+    
+    &:hover {
+      background: #1a1e2d !important;
+    }
+    
+    &.p-highlight {
+      background: rgba(0, 210, 255, 0.1) !important;
+      color: var(--app-text-main) !important;
+    }
+  }
+}
+
+/* Input Fields */
+.p-inputtext {
+  background: #121520 !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-radius: 6px !important;
+  color: var(--app-text-main) !important;
+  padding: 0.75rem 1rem !important;
+  
+  &:focus {
+    border-color: var(--app-cyan) !important;
+    box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.15) !important;
+  }
+  
+  &::placeholder {
+    color: var(--app-text-muted) !important;
+    opacity: 0.6;
+  }
+}
+
+/* Buttons */
+.p-button {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  padding: 0.75rem 1.25rem !important;
+  transition: all 0.2s !important;
+  
+  &.p-button-cyan {
+    background: var(--app-cyan) !important;
+    border-color: var(--app-cyan) !important;
+    color: #0c0e14 !important;
+    
+    &:hover {
+      background: var(--app-cyan-hover) !important;
+      border-color: var(--app-cyan-hover) !important;
+    }
+  }
+  
+  &.p-button-outlined {
+    border-color: var(--app-cyan) !important;
+    color: var(--app-cyan) !important;
+    
+    &:hover {
+      background: rgba(0, 210, 255, 0.05) !important;
+    }
+  }
+}
+
+/* Progress Bar Overrides */
+.p-progressbar {
+  background: #1c2133 !important;
+  height: 6px !important;
+  border-radius: 3px !important;
+  
+  .p-progressbar-value {
+    background: var(--app-cyan) !important;
+  }
+}
+
+/* Paginator */
+.p-paginator {
+  background: #141722 !important;
+  border: none !important;
+  border-top: 1px solid #1a1e2d !important;
+  padding: 0.75rem 1rem !important;
+  
+  .p-paginator-pages .p-paginator-page {
+    color: var(--app-text-muted) !important;
+    min-width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 4px !important;
+    margin: 0 0.2rem !important;
+    
+    &.p-highlight {
+      background: rgba(0, 210, 255, 0.15) !important;
+      color: var(--app-cyan) !important;
+    }
+    
+    &:not(.p-highlight):hover {
+      background: #1a1e2d !important;
+      color: var(--app-text-main) !important;
+    }
+  }
+}
+
+/* Code Highlight styling */
+pre.code-terminal {
+  background: #090a0f;
+  border: 1px solid #171a26;
+  border-radius: 8px;
+  padding: 1.25rem;
+  overflow: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  color: #a9b7c6;
+  line-height: 1.5;
+  
+  .keyword { color: #cc7832; font-weight: 500; }
+  .string { color: #6a8759; }
+  .comment { color: #808080; font-style: italic; }
+  .function { color: #ffc66d; }
+  .type { color: #287bde; }
+}
+
+.terminal-header {
+  background: #121520;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  border: 1px solid #171a26;
+  border-bottom: none;
+  
+  .dots {
+    display: flex;
+    gap: 6px;
+    margin-right: 1rem;
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      &.red { background-color: #ff5f56; }
+      &.yellow { background-color: #ffbd2e; }
+      &.green { background-color: #27c93f; }
+    }
+  }
+  .title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--app-text-muted);
+  }
+}

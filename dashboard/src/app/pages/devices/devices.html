@@ -1,0 +1,81 @@
+<div class="devices-page-container">
+  <!-- Page Hero Header -->
+  <div class="page-hero-header">
+    <div class="header-text-area">
+      <h2 class="hero-title">Active Agents Summary</h2>
+      <p class="hero-subtitle">Monitor hardware health status, OS profiles, status, and last report time signatures of all enrolled hosts.</p>
+    </div>
+    <div class="header-action-area">
+      <button pButton type="button" icon="pi pi-refresh" label="Refresh Grid" class="p-button-outlined p-button-cyan refresh-btn" (click)="fetchDevices()" [loading]="loading"></button>
+    </div>
+  </div>
+
+  <!-- Grid Actions Bar -->
+  <div class="grid-actions-bar">
+    <div class="search-input-wrapper">
+      <i class="pi pi-search search-icon"></i>
+      <input type="text" pInputText placeholder="Filter by name, platform, act..." [(ngModel)]="searchQuery" (input)="filterGrid()" class="search-input">
+    </div>
+    <div class="helper-text-label">
+      <span>Click on any <span class="online-highlight">ONLINE</span> row to review deep real-time system metrics.</span>
+    </div>
+  </div>
+
+  <!-- PrimeNG Data Table -->
+  <div class="table-card">
+    <p-table [value]="filteredDevices" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,50]" responsiveLayout="scroll" styleClass="p-datatable-sm" (onRowSelect)="onRowSelect($event.data)">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="machine_name">Machine Name <p-sortIcon field="machine_name"></p-sortIcon></th>
+          <th pSortableColumn="os_type">Operating System <p-sortIcon field="os_type"></p-sortIcon></th>
+          <th pSortableColumn="status">Agent Status <p-sortIcon field="status"></p-sortIcon></th>
+          <th pSortableColumn="last_seen">Last Seen / Pulsed <p-sortIcon field="last_seen"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-device>
+        <tr (click)="onRowSelect(device)" [class.offline-row]="device.status === 'OFFLINE'">
+          <!-- Machine Name -->
+          <td>
+            <div class="cell-machine">
+              <i class="pi pi-server machine-icon"></i>
+              <span class="machine-name-text">{{ device.machine_name }}</span>
+            </div>
+          </td>
+          
+          <!-- OS Type -->
+          <td>
+            <div class="cell-os">
+              <!-- Render OS-specific icons -->
+              @if (device.os_type === 'windows') {
+                <i class="pi pi-microsoft os-icon windows-color"></i>
+              } @else if (device.os_type === 'darwin' || device.os_type === 'mac') {
+                <i class="pi pi-apple os-icon mac-color"></i>
+              } @else {
+                <i class="pi pi-circle-fill os-icon linux-color"></i>
+              }
+              <span class="os-text">{{ device.os_type }}</span>
+            </div>
+          </td>
+          
+          <!-- Agent Status -->
+          <td>
+            <div class="cell-status">
+              @if (device.status === 'ONLINE') {
+                <span class="status-badge online-badge">ONLINE</span>
+              } @else if (device.status === 'PENDING') {
+                <span class="status-badge pending-badge">PENDING</span>
+              } @else {
+                <span class="status-badge offline-badge">OFFLINE</span>
+              }
+            </div>
+          </td>
+          
+          <!-- Last Seen -->
+          <td>
+            <span class="last-seen-text">{{ device.last_seen }}</span>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

@@ -1,0 +1,215 @@
+.msg-config-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.page-hero-header {
+  .hero-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--app-text-main);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .hero-subtitle {
+    font-size: 0.88rem;
+    color: var(--app-text-muted);
+    margin: 0;
+    line-height: 1.5;
+    max-width: 600px;
+  }
+}
+
+.config-card {
+  background-color: var(--app-card-bg);
+  border: 1px solid var(--app-card-border);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  box-sizing: border-box;
+
+  .card-hero-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--app-text-main);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .card-subtitle {
+    font-size: 0.88rem;
+    color: var(--app-text-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--app-text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Password wrapper with eye button overlay */
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  input {
+    padding-right: 2.5rem !important;
+  }
+
+  .password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--app-text-muted);
+    cursor: pointer;
+    padding: 4px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s;
+
+    &:hover {
+      color: var(--app-text-main);
+    }
+  }
+}
+
+.action-row-area {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+
+  .save-config-btn {
+    font-size: 0.88rem !important;
+  }
+
+  .success-toast-msg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--app-green);
+    font-weight: 500;
+    animation: fade-in 0.2s;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateX(-5px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* Right Column: Template Preview */
+.template-card {
+  background-color: var(--app-card-bg);
+  border: 1px solid var(--app-card-border);
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  box-sizing: border-box;
+
+  .card-hero-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--app-text-main);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .card-subtitle {
+    font-size: 0.88rem;
+    color: var(--app-text-muted);
+    margin: 0;
+    line-height: 1.6;
+  }
+}
+
+.custom-textarea {
+  background: #121520 !important;
+  border: 1px solid var(--app-card-border) !important;
+  border-radius: 6px !important;
+  color: var(--app-text-main) !important;
+  padding: 0.85rem 1rem !important;
+  font-family: 'Inter', sans-serif !important;
+  font-size: 0.88rem !important;
+  line-height: 1.5 !important;
+  resize: vertical;
+  box-sizing: border-box;
+
+  &:focus {
+    border-color: var(--app-cyan) !important;
+    box-shadow: 0 0 0 2px rgba(0, 210, 255, 0.15) !important;
+  }
+}
+
+/* Simulated Preview Subcard */
+.preview-subcard {
+  background-color: #0c0e14;
+  border: 1px solid #1c2130;
+  border-radius: 8px;
+  padding: 1.25rem;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  .preview-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    .preview-icon {
+      color: var(--app-green);
+      font-size: 0.88rem;
+    }
+
+    .preview-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 700;
+      color: var(--app-green);
+      letter-spacing: 0.05em;
+    }
+  }
+
+  .preview-body {
+    .preview-meta-row {
+      display: flex;
+      font-size: 0.85rem;
+      
+      .meta-lbl {
+        width: 80px;
+        color: var(--app-text-muted);
+      }
+
+      .meta-val {
+        color: var(--app-text-main);
+      }
+
+      .text-cyan {
+        color: var(--app-cyan);
+      }
+    }
+
+    .preview-divider {
+      border: none;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin: 12px 0;
+    }
+
+    .preview-body-content {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #b8c6d4;
+      white-space: pre-line;
+      line-height: 1.6;
+    }
+  }
+}

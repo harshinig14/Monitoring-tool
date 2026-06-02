@@ -1,0 +1,122 @@
+<div class="alerts-page-container">
+  <!-- Page Header -->
+  <div class="page-hero-header">
+    <div class="header-text-area">
+      <h2 class="hero-title">Alerts & Rules</h2>
+      <p class="hero-subtitle">Establish trigger limits for core metrics and inspect recent threshold encroachment logs across the network.</p>
+    </div>
+  </div>
+
+  <div class="grid col-gap-4 row-gap-4">
+    <!-- Left Column: Threshold Adjuster -->
+    <div class="col-12 lg:col-5">
+      <div class="config-card">
+        <h3 class="card-hero-title">Threshold Configuration</h3>
+        <p class="card-subtitle">Define the upper system usage limits. Moving past these boundaries will flag logs and dispatch notifications.</p>
+        
+        <div class="threshold-adjusters-list mt-4">
+          <!-- CPU Threshold -->
+          <div class="adjuster-item">
+            <div class="item-label-row">
+              <span class="label-name"><i class="pi pi-cpu inline-icon"></i> CPU Threshold</span>
+            </div>
+            <div class="adjuster-controls-row mt-2">
+              <button type="button" class="btn-ctrl" (click)="adjust('cpu', -5)"><i class="pi pi-minus"></i></button>
+              <div class="value-display-box">{{ cpuTh }}</div>
+              <button type="button" class="btn-ctrl" (click)="adjust('cpu', 5)"><i class="pi pi-plus"></i></button>
+              <span class="unit-label">%</span>
+            </div>
+          </div>
+
+          <!-- Memory Threshold -->
+          <div class="adjuster-item">
+            <div class="item-label-row">
+              <span class="label-name"><i class="pi pi-database inline-icon"></i> Memory Threshold</span>
+            </div>
+            <div class="adjuster-controls-row mt-2">
+              <button type="button" class="btn-ctrl" (click)="adjust('mem', -5)"><i class="pi pi-minus"></i></button>
+              <div class="value-display-box">{{ memTh }}</div>
+              <button type="button" class="btn-ctrl" (click)="adjust('mem', 5)"><i class="pi pi-plus"></i></button>
+              <span class="unit-label">%</span>
+            </div>
+          </div>
+
+          <!-- Disk Threshold -->
+          <div class="adjuster-item">
+            <div class="item-label-row">
+              <span class="label-name"><i class="pi pi-hdd inline-icon"></i> Disk Threshold</span>
+            </div>
+            <div class="adjuster-controls-row mt-2">
+              <button type="button" class="btn-ctrl" (click)="adjust('disk', -5)"><i class="pi pi-minus"></i></button>
+              <div class="value-display-box">{{ diskTh }}</div>
+              <button type="button" class="btn-ctrl" (click)="adjust('disk', 5)"><i class="pi pi-plus"></i></button>
+              <span class="unit-label">%</span>
+            </div>
+          </div>
+
+          <!-- Network Threshold -->
+          <div class="adjuster-item">
+            <div class="item-label-row">
+              <span class="label-name"><i class="pi pi-wifi inline-icon"></i> Network Threshold</span>
+            </div>
+            <div class="adjuster-controls-row mt-2">
+              <button type="button" class="btn-ctrl" (click)="adjust('net', -10)"><i class="pi pi-minus"></i></button>
+              <div class="value-display-box">{{ netTh }}</div>
+              <button type="button" class="btn-ctrl" (click)="adjust('net', 10)"><i class="pi pi-plus"></i></button>
+              <span class="unit-label">MB/s</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row-area mt-5">
+          <button pButton type="button" label="Save Thresholds" icon="pi pi-save" class="p-button-cyan save-config-btn" (click)="saveThresholds()"></button>
+          
+          @if (saveSuccess) {
+            <span class="success-toast-msg">
+              <i class="pi pi-check-circle"></i> Thresholds Saved
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Recent Alerts Table -->
+    <div class="col-12 lg:col-7">
+      <div class="alerts-log-card">
+        <h3 class="card-hero-title">Recent Alerts (Static)</h3>
+        <p class="card-subtitle">Audit recent instances where telemetry readings crossed the defined maximum safety levels.</p>
+        
+        <div class="alerts-table-wrapper mt-4">
+          <p-table [value]="alertsLog" responsiveLayout="scroll" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th>Severity</th>
+                <th>Metric</th>
+                <th>Value</th>
+                <th>Threshold</th>
+                <th>Machine</th>
+                <th>Time</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-alert>
+              <tr>
+                <td>
+                  @if (alert.severity === 'CRITICAL') {
+                    <span class="severity-badge critical-badge">CRITICAL</span>
+                  } @else {
+                    <span class="severity-badge warning-badge">WARNING</span>
+                  }
+                </td>
+                <td><span class="metric-cell-text">{{ alert.metric }}</span></td>
+                <td><span class="val-cell-text">{{ alert.value }}</span></td>
+                <td><span class="th-cell-text">{{ alert.threshold }}</span></td>
+                <td><span class="machine-cell-text">{{ alert.machine }}</span></td>
+                <td><span class="time-cell-text">{{ alert.time }}</span></td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

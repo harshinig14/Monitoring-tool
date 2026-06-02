@@ -1,0 +1,125 @@
+<div class="msg-config-page-container">
+  <!-- Page Header -->
+  <div class="page-hero-header">
+    <div class="header-text-area">
+      <h2 class="hero-title">Notification & Message Configuration</h2>
+      <p class="hero-subtitle">Configure outbound mail relays and layout alert dispatched schemas for immediate investigation reports.</p>
+    </div>
+  </div>
+
+  <div class="grid col-gap-4 row-gap-4">
+    <!-- Left Column: SMTP Configuration Form -->
+    <div class="col-12 lg:col-6">
+      <div class="config-card">
+        <h3 class="card-hero-title">SMTP Settings</h3>
+        <p class="card-subtitle">Establish transmission relays so notifications dispatch cleanly upon critical threshold encroachment.</p>
+        
+        <div class="form-fields-deck mt-4">
+          <!-- SMTP Server -->
+          <div class="form-field">
+            <label class="field-label">SMTP Server</label>
+            <input type="text" pInputText [(ngModel)]="server" class="w-full mt-2">
+          </div>
+
+          <!-- SMTP Port -->
+          <div class="form-field mt-3">
+            <label class="field-label">SMTP Port</label>
+            <input type="number" pInputText [(ngModel)]="port" class="w-full mt-2">
+          </div>
+
+          <!-- Username -->
+          <div class="form-field mt-3">
+            <label class="field-label">Username</label>
+            <input type="text" pInputText [(ngModel)]="username" class="w-full mt-2">
+          </div>
+
+          <!-- Password with eye toggle -->
+          <div class="form-field mt-3">
+            <label class="field-label">Password</label>
+            <div class="password-input-wrapper mt-2">
+              <input [type]="showPasswordState ? 'text' : 'password'" pInputText [(ngModel)]="passwordHidden" class="w-full">
+              <button type="button" class="password-toggle-btn" (click)="togglePassword()">
+                <i class="pi" [class.pi-eye]="!showPasswordState" [class.pi-eye-slash]="showPasswordState"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- From Address -->
+          <div class="form-field mt-3">
+            <label class="field-label">From Email Address</label>
+            <input type="text" pInputText [(ngModel)]="fromAddress" class="w-full mt-2">
+          </div>
+
+          <!-- Primary Recipient -->
+          <div class="form-field mt-3">
+            <label class="field-label">Primary Recipient</label>
+            <input type="text" pInputText [(ngModel)]="primaryRecipient" class="w-full mt-2">
+          </div>
+
+          <!-- Alternate Recipient -->
+          <div class="form-field mt-3">
+            <label class="field-label">Alternate Recipient</label>
+            <input type="text" pInputText [(ngModel)]="alternateRecipient" class="w-full mt-2">
+          </div>
+        </div>
+
+        <div class="action-row-area mt-5">
+          <button pButton type="button" label="Save SMTP Configuration" icon="pi pi-save" class="p-button-cyan save-config-btn" (click)="saveSmtpSettings()"></button>
+          
+          @if (saveSuccess) {
+            <span class="success-toast-msg">
+              <i class="pi pi-check-circle"></i> Settings Saved
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Email Template Editor & Live Preview -->
+    <div class="col-12 lg:col-6">
+      <div class="template-card">
+        <h3 class="card-hero-title">Email Template Preview</h3>
+        <p class="card-subtitle">Draft alert dispatched schemas. Use double curly bracket variables (for example, double curly brackets wrapping machineName) for automated substitution.</p>
+
+        <div class="form-fields-deck mt-4">
+          <!-- Subject Template -->
+          <div class="form-field">
+            <label class="field-label">Subject Template</label>
+            <input type="text" pInputText [(ngModel)]="subjectTemplate" class="w-full mt-2 font-semibold">
+          </div>
+
+          <!-- Body Template Textarea -->
+          <div class="form-field mt-3">
+            <label class="field-label">Body Macro Text</label>
+            <textarea rows="8" [(ngModel)]="bodyMacroText" class="w-full mt-2 custom-textarea"></textarea>
+          </div>
+        </div>
+
+        <!-- Dynamic Simulated Dispatch Preview Sub-Card -->
+        <div class="preview-subcard mt-4">
+          <div class="preview-header">
+            <i class="pi pi-eye preview-icon"></i>
+            <span class="preview-title">SIMULATED DISPATCH PREVIEW</span>
+          </div>
+          
+          <div class="preview-body mt-3">
+            <div class="preview-meta-row">
+              <span class="meta-lbl">To:</span>
+              <span class="meta-val font-semibold text-cyan">{{ primaryRecipient || 'N/A' }}</span>
+            </div>
+            <div class="preview-meta-row mt-2">
+              <span class="meta-lbl">Subject:</span>
+              <span class="meta-val font-semibold">{{ parsedSubjectPreview }}</span>
+            </div>
+            
+            <hr class="preview-divider mt-3 mb-3">
+            
+            <div class="preview-body-content">
+              {{ parsedBodyPreview }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

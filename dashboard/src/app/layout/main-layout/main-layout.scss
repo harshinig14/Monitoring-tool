@@ -1,0 +1,32 @@
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--app-bg-dark);
+}
+
+.sidebar-area {
+  width: 260px;
+  min-width: 260px;
+  height: 100%;
+  background-color: var(--app-sidebar-bg);
+  border-right: 1px solid var(--app-sidebar-border);
+  display: flex;
+  flex-direction: column;
+}
+
+.main-content-area {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.content-viewport {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  background-color: var(--app-bg-dark);
+}

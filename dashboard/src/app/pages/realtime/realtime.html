@@ -1,0 +1,170 @@
+<div class="realtime-page-container">
+  @if (device) {
+    <!-- Console Title Header -->
+    <div class="console-hero-header">
+      <div class="header-left">
+        <i class="pi pi-desktop console-icon"></i>
+        <div class="title-meta">
+          <h2 class="console-title">Metric Console: {{ device.machine_name }}</h2>
+          <div class="console-meta-info">
+            <span class="meta-item">Platform: <span class="highlight">{{ device.os_type }}</span></span>
+            <span class="meta-divider">|</span>
+            <span class="meta-item">status: 
+              <span class="status-indicator" [class.online]="device.status === 'ONLINE'" [class.offline]="device.status === 'OFFLINE'">
+                <span class="indicator-dot"></span>
+                {{ device.status }}
+              </span>
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="poll-badge">
+          <span class="badge-dot animate-pulse"></span>
+          <span class="badge-text">10s agent poll</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 Core Metric Panels Grid -->
+    <div class="grid col-gap-4 row-gap-4">
+      <!-- CPU Card -->
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="metric-card border-cyan">
+          <div class="card-header">
+            <span class="card-title">CPU USAGE</span>
+            <i class="pi pi-cpu card-icon icon-cyan"></i>
+          </div>
+          <div class="card-value value-cyan">{{ cpuUsage }}%</div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill fill-cyan" [style.width.%]="cpuUsage"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memory Card -->
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="metric-card border-green">
+          <div class="card-header">
+            <span class="card-title">MEMORY USAGE</span>
+            <i class="pi pi-database card-icon icon-green"></i>
+          </div>
+          <div class="card-value value-green">{{ memoryUsage }}%</div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill fill-green" [style.width.%]="memoryUsage"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disk Card -->
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="metric-card border-yellow">
+          <div class="card-header">
+            <span class="card-title">DISK USAGE</span>
+            <i class="pi pi-hdd card-icon icon-yellow"></i>
+          </div>
+          <div class="card-value value-yellow">{{ diskUsage }}%</div>
+          <div class="progress-bar-wrapper">
+            <div class="progress-bar-fill fill-yellow" [style.width.%]="diskUsage"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Card -->
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="metric-card border-purple">
+          <div class="card-header">
+            <span class="card-title">NETWORK THROUGHPUT</span>
+            <i class="pi pi-wifi card-icon icon-purple"></i>
+          </div>
+          <div class="card-value value-purple">{{ networkUsage }} <span class="unit-text">MB/s</span></div>
+          <div class="network-indicator">
+            <div class="active-pulse-bar">
+              <span class="bar-dot"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Segment Filter Tabs -->
+    <div class="history-tab-bar">
+      <button class="tab-btn" [class.active]="activeTab === '5m'" (click)="changeTab('5m')">Last 5 Minutes</button>
+      <button class="tab-btn" [class.active]="activeTab === '1h'" (click)="changeTab('1h')">Last 1 Hour</button>
+      <button class="tab-btn" [class.active]="activeTab === '24h'" (click)="changeTab('24h')">Last 24 Hours</button>
+    </div>
+
+    <!-- Dynamic Line Charts Grid -->
+    <div class="grid col-gap-4 row-gap-4 mt-2">
+      <!-- CPU Load Chart -->
+      <div class="col-12 lg:col-6">
+        <div class="chart-card">
+          <h3 class="chart-title">CPU Load Trend (%)</h3>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [datasets]="cpuDatasets"
+                    [labels]="chartLabels"
+                    [options]="chartOptions"
+                    [legend]="false"
+                    type="line">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Memory Allocation Chart -->
+      <div class="col-12 lg:col-6">
+        <div class="chart-card">
+          <h3 class="chart-title">Memory Allocation Trend (%)</h3>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [datasets]="memoryDatasets"
+                    [labels]="chartLabels"
+                    [options]="chartOptions"
+                    [legend]="false"
+                    type="line">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Disk Operations Chart -->
+      <div class="col-12 lg:col-6">
+        <div class="chart-card">
+          <h3 class="chart-title">Disk Operations I/O (%)</h3>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [datasets]="diskDatasets"
+                    [labels]="chartLabels"
+                    [options]="chartOptions"
+                    [legend]="false"
+                    type="line">
+            </canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Bandwidth Chart -->
+      <div class="col-12 lg:col-6">
+        <div class="chart-card">
+          <h3 class="chart-title">Network Bandwidth (MB/s)</h3>
+          <div class="chart-wrapper">
+            <canvas baseChart
+                    [datasets]="networkDatasets"
+                    [labels]="chartLabels"
+                    [options]="networkChartOptions"
+                    [legend]="false"
+                    type="line">
+            </canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- Prompt when loading or device is missing -->
+    <div class="loading-state-wrapper">
+      <i class="pi pi-spin pi-spinner loading-spinner"></i>
+      <span class="loading-text">Connecting to device telemetry data relay...</span>
+    </div>
+  }
+</div>
