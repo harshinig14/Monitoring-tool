@@ -4,76 +4,132 @@
   gap: 1.5rem;
 }
 
+/* Page Header area styling */
 .page-hero-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  margin-bottom: 0.5rem;
 
   .hero-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--app-text-main);
-    margin: 0 0 0.5rem 0;
+    font-size: 1.65rem;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0 0 0.4rem 0;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.01em;
   }
 
   .hero-subtitle {
     font-size: 0.88rem;
-    color: var(--app-text-muted);
+    color: #7d8b9b;
     margin: 0;
-    line-height: 1.5;
-    max-width: 600px;
   }
 
   .add-device-btn {
-    font-size: 0.88rem !important;
-    border-color: var(--app-cyan) !important;
+    background: transparent !important;
+    border: 1px solid var(--app-cyan) !important;
     color: var(--app-cyan) !important;
+    border-radius: 6px !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    padding: 0.6rem 1.2rem !important;
+    font-family: 'Inter', sans-serif !important;
+    transition: all 0.2s ease-in-out !important;
 
     &:hover {
-      background: rgba(0, 210, 255, 0.05) !important;
+      background: rgba(0, 210, 255, 0.08) !important;
+      border-color: var(--app-cyan) !important;
+      box-shadow: 0 0 8px rgba(0, 210, 255, 0.2) !important;
     }
   }
 }
 
+/* Polling Configuration Card (Left Column) */
 .config-card {
-  background-color: var(--app-card-bg);
-  border: 1px solid var(--app-card-border);
+  background-color: #11131a;
+  border: 1px solid #1c2130;
   border-radius: 8px;
-  padding: 2rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   height: 100%;
   box-sizing: border-box;
+
+  .card-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.75rem;
+
+    .card-title-icon {
+      color: #00d2ff;
+      font-size: 1.1rem;
+    }
+  }
 
   .card-hero-title {
     font-size: 1.15rem;
     font-weight: 600;
-    color: var(--app-text-main);
-    margin: 0 0 0.5rem 0;
+    color: #ffffff;
+    margin: 0;
+    font-family: 'Inter', sans-serif;
   }
 
   .card-subtitle {
     font-size: 0.88rem;
-    color: var(--app-text-muted);
-    margin: 0;
-    line-height: 1.6;
+    color: #7d8b9b;
+    margin: 0 0 1.5rem 0;
+    line-height: 1.5;
   }
 }
 
+/* Form field label and inputs */
 .input-field-label {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--app-text-main);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #7d8b9b;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
+.custom-dropdown-select {
+  background-color: #0c0e14 !important;
+  border: 1px solid #1c2130 !important;
+  color: #ffffff !important;
+  border-radius: 6px !important;
+  padding: 0.4rem 0.6rem !important;
+
+  .p-select-label {
+    color: #ffffff !important;
+    font-size: 0.88rem !important;
+  }
+
+  .p-select-trigger {
+    color: #7d8b9b !important;
+  }
+}
+
+/* Configuration save button and message */
 .action-row-area {
   display: flex;
   align-items: center;
   gap: 1.5rem;
 
   .save-config-btn {
+    background: transparent !important;
+    border: 1px solid var(--app-cyan) !important;
+    color: var(--app-cyan) !important;
+    border-radius: 6px !important;
     font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.2s ease-in-out !important;
+
+    &:hover {
+      background: rgba(0, 210, 255, 0.08) !important;
+      border-color: var(--app-cyan) !important;
+      box-shadow: 0 0 8px rgba(0, 210, 255, 0.2) !important;
+    }
   }
 
   .success-toast-msg {
@@ -94,28 +150,140 @@
 
 .notice-footer-text {
   font-size: 0.82rem;
-  color: var(--app-text-muted);
-  line-height: 1.5;
+  color: #526071;
+  margin-top: 1.5rem;
 }
 
-/* Terminal & Registered Platforms */
+/* Code Terminal styling (Right Column) */
 .terminal-container {
+  background-color: #0b0c10;
+  border: 1px solid #1c2130;
+  border-radius: 8px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+
+  .terminal-header {
+    background-color: #0d0e12;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #1c2130;
+
+    .dots-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .dots {
+      display: flex;
+      gap: 6px;
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        display: inline-block;
+
+        &.red { background-color: #ff5f56; }
+        &.yellow { background-color: #ffbd2e; }
+        &.green { background-color: #27c93f; }
+      }
+    }
+
+    .title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #7d8b9b;
+      font-weight: 500;
+    }
+  }
+
+  .code-terminal {
+    margin: 0;
+    padding: 1.5rem;
+    background-color: #0b0c10;
+    overflow-x: auto;
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      color: #e3e6ed;
+
+      .keyword { color: #ff7b72; font-weight: 500; }
+      .string { color: #a5d6ff; }
+      .comment { color: #7d8b9b; font-style: italic; }
+      .function { color: #d2a8ff; }
+    }
+  }
 }
 
+/* Registered Platforms Card (Wide, directly below Row 1) */
 .registered-platforms-card {
-  background-color: var(--app-card-bg);
-  border: 1px solid var(--app-card-border);
+  background-color: #11131a;
+  border: 1px solid #1c2130;
   border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
 
-  .platforms-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--app-text-main);
-    margin: 0 0 1rem 0;
-    letter-spacing: 0.2px;
+  .platforms-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #1c2130;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+
+    .platforms-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .platforms-icon {
+        color: #00d2ff;
+        font-size: 1.1rem;
+      }
+
+      .platforms-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+      }
+    }
+
+    .online-badge-pill {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 210, 255, 0.05);
+      border: 1px solid rgba(0, 210, 255, 0.15);
+      border-radius: 6px;
+      padding: 0.4rem 0.8rem;
+      min-width: 50px;
+
+      .badge-num {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #00d2ff;
+        line-height: 1;
+      }
+
+      .badge-txt {
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: #00d2ff;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 2px;
+      }
+    }
   }
 }
 
@@ -126,59 +294,106 @@
 }
 
 .platform-item {
-  background-color: #11131a;
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  background-color: #0c0e14;
+  border: 1px solid #1c2130;
   border-radius: 6px;
-  padding: 0.85rem 1.25rem;
+  padding: 1rem 1.25rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  transition: background-color 0.2s;
+  transition: background-color 0.2s, border-color 0.2s;
 
   &:hover {
-    background-color: #151821;
+    background-color: #121520;
+    border-color: rgba(0, 210, 255, 0.2);
   }
 
   .platform-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px;
 
-    .platform-icon {
-      font-size: 1.1rem;
+    .platform-icon-box {
+      width: 36px;
+      height: 36px;
+      background-color: #11131a;
+      border: 1px solid #1c2130;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
 
-      &.windows-color { color: #0078d4; }
-      &.linux-color { color: #f7b801; }
-      &.mac-color { color: #ffffff; }
+      .platform-icon {
+        font-size: 1.15rem;
+
+        &.windows-color { color: #0078d4; }
+        &.linux-color { color: #f7b801; }
+        &.mac-color { color: #ffffff; }
+      }
     }
 
-    .platform-name {
-      display: block;
-      font-size: 0.88rem;
-      font-weight: 600;
-      color: var(--app-text-main);
-      margin-bottom: 2px;
+    .platform-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .platform-name {
+        font-size: 0.92rem;
+        font-weight: 600;
+        color: #ffffff;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .platform-meta {
+        font-size: 0.8rem;
+        color: #7d8b9b;
+
+        .val {
+          color: #a4b2c1;
+          font-weight: 500;
+        }
+      }
     }
+  }
 
-    .platform-meta {
-      font-size: 0.78rem;
-      color: var(--app-text-muted);
+  .platform-right {
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
 
-      .val {
-        color: #9ab4cc;
-        font-weight: 500;
+      &.online {
+        background-color: rgba(0, 230, 118, 0.06);
+        color: #00e676;
+        border: 1px solid rgba(0, 230, 118, 0.15);
+      }
+
+      &.pending {
+        background-color: rgba(255, 145, 0, 0.06);
+        color: #ff9100;
+        border: 1px solid rgba(255, 145, 0, 0.15);
+      }
+
+      &.offline {
+        background-color: rgba(255, 61, 0, 0.06);
+        color: #ff3d00;
+        border: 1px solid rgba(255, 61, 0, 0.15);
       }
     }
   }
 }
 
-/* Wizard CSS */
+/* Wizard Panel styling (collapsible at the bottom) */
 .add-device-wizard-card {
-  background-color: var(--app-card-bg);
-  border: 1px solid var(--app-card-border);
+  background-color: #11131a;
+  border: 1px solid #1c2130;
   border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
 
   .wizard-header {
@@ -188,23 +403,24 @@
     margin-bottom: 0.5rem;
 
     .wizard-title {
-      font-size: 1.1rem;
+      font-size: 1.15rem;
       font-weight: 600;
-      color: var(--app-text-main);
+      color: #ffffff;
       margin: 0;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-family: 'Inter', sans-serif;
 
       i {
-        color: var(--app-cyan);
+        color: #00d2ff;
       }
     }
 
     .close-wizard-btn {
       background: none;
       border: none;
-      color: var(--app-text-muted);
+      color: #7d8b9b;
       cursor: pointer;
       font-size: 1.1rem;
       padding: 4px;
@@ -214,16 +430,16 @@
       transition: all 0.2s;
 
       &:hover {
-        color: var(--app-text-main);
+        color: #ffffff;
         background-color: rgba(255, 255, 255, 0.05);
       }
     }
   }
 
   .wizard-subtitle {
-    font-size: 0.85rem;
-    color: var(--app-text-muted);
-    margin: 0 0 1rem 0;
+    font-size: 0.88rem;
+    color: #7d8b9b;
+    margin: 0 0 1.25rem 0;
     line-height: 1.5;
   }
 }
@@ -256,25 +472,25 @@
     .os-card-label {
       font-size: 0.82rem;
       font-weight: 600;
-      color: var(--app-text-muted);
+      color: #7d8b9b;
     }
 
     &:hover {
       background-color: #121520;
-      border-color: var(--app-cyan);
+      border-color: #00d2ff;
       
       .os-card-label {
-        color: var(--app-text-main);
+        color: #ffffff;
       }
     }
 
     &.active {
       background-color: rgba(0, 210, 255, 0.04);
-      border-color: var(--app-cyan);
+      border-color: #00d2ff;
       box-shadow: 0 0 8px rgba(0, 210, 255, 0.15);
 
       .os-card-label {
-        color: var(--app-cyan);
+        color: #00d2ff;
       }
     }
   }
@@ -289,20 +505,21 @@
   .instructions-title {
     font-size: 0.88rem;
     font-weight: 600;
-    color: var(--app-text-main);
+    color: #ffffff;
     margin: 0 0 0.5rem 0;
     display: flex;
     align-items: center;
     gap: 6px;
+    font-family: 'Inter', sans-serif;
 
     i {
-      color: var(--app-cyan);
+      color: #00d2ff;
     }
   }
 
   .download-alert-text {
     font-size: 0.8rem;
-    color: var(--app-green);
+    color: #00e676;
     margin: 0;
     display: flex;
     align-items: center;

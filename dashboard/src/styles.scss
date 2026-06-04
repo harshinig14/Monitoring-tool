@@ -158,10 +158,44 @@ body {
       border-color: var(--app-cyan-hover) !important;
     }
   }
+
+  &.p-button-danger {
+    background: #ef4444 !important;
+    border-color: #ef4444 !important;
+    color: #ffffff !important;
+    
+    &:hover {
+      background: #dc2626 !important;
+      border-color: #dc2626 !important;
+    }
+  }
+
+  &.p-button-secondary {
+    background: #4b5563 !important;
+    border-color: #4b5563 !important;
+    color: #ffffff !important;
+    
+    &:hover {
+      background: #374151 !important;
+      border-color: #374151 !important;
+    }
+  }
+
+  &.p-button-success {
+    background: #22c55e !important;
+    border-color: #22c55e !important;
+    color: #ffffff !important;
+    
+    &:hover {
+      background: #16a34a !important;
+      border-color: #16a34a !important;
+    }
+  }
   
   &.p-button-outlined {
     border-color: var(--app-cyan) !important;
     color: var(--app-cyan) !important;
+    background: transparent !important;
     
     &:hover {
       background: rgba(0, 210, 255, 0.05) !important;

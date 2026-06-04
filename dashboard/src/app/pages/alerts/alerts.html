@@ -69,7 +69,10 @@
         </div>
 
         <div class="action-row-area mt-5">
-          <button pButton type="button" label="Save Thresholds" icon="pi pi-save" class="p-button-cyan save-config-btn" (click)="saveThresholds()"></button>
+          <button class="p-button p-button-cyan save-config-btn" (click)="saveThresholds()">
+            <i class="pi pi-save" style="margin-right: 8px;"></i>
+            Save Thresholds
+          </button>
           
           @if (saveSuccess) {
             <span class="success-toast-msg">

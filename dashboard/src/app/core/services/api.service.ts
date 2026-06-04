@@ -17,6 +17,10 @@ export class ApiService {
     return this.http.get<Device[]>(`${this.baseUrl}/devices`);
   }
 
+  postDebugLog(message: string, data: any): Observable<any> {
+    return this.http.post(`${this.baseUrl}/debug-log`, { message, data });
+  }
+
   getDeviceById(id: number): Observable<Device> {
     return this.http.get<Device>(`${this.baseUrl}/devices/${id}`);
   }
@@ -38,7 +42,7 @@ export class ApiService {
 
   // 5. Configuration Settings
   getConfiguration(): Observable<{ polling_frequency: number }> {
-    return this.http.get<{ polling_frequency: number }>(`${this.baseUrl}/configuration`);
+    return this.http.get<{ polling_frequency: number }>(`${this.baseUrl}/configuration?t=` + new Date().getTime());
   }
 
   updateConfiguration(pollingFrequency: number): Observable<{ success: boolean }> {
@@ -56,11 +60,19 @@ export class ApiService {
 
   // 7. Email / Message Configuration
   getEmailConfig(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/alerts/email-config`);
+    return this.http.get<any>(`${this.baseUrl}/email-config`);
   }
 
   updateEmailConfig(config: any): Observable<any> {
-    return this.http.put<any>(`${this.baseUrl}/alerts/email-config`, config);
+    return this.http.put<any>(`${this.baseUrl}/email-config`, config);
+  }
+
+  sendTestEmail(): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/email/test`, {});
+  }
+
+  getEmailLogs(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/email/logs`);
   }
 
   // 8. Agent Download URLs
@@ -68,16 +80,57 @@ export class ApiService {
     return `${this.baseUrl}/download-agent/${os}`;
   }
 
+  requestAddDevice(osType: string): Observable<{ download_url: string }> {
+    return this.http.post<{ download_url: string }>(`${this.baseUrl}/devices/request`, { os_type: osType });
+  }
+
+  deactivateDevice(id: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/devices/${id}/deactivate`, {});
+  }
+
+  activateDevice(id: number): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/devices/${id}/activate`, {});
+  }
+
+  removeDevice(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.baseUrl}/devices/${id}`);
+  }
+
+  getDeviceHistory(id: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/devices/${id}/history`);
+  }
+
+  // 8.5. Get Recent Alerts
+  getAlerts(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/alerts/recent`);
+  }
+
   // 9. Reports Data
-  getReportsDaily(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/reports/daily`);
+  getReportsDaily(deviceId?: number): Observable<any> {
+    const url = deviceId ? `${this.baseUrl}/reports/daily?deviceId=${deviceId}` : `${this.baseUrl}/reports/daily`;
+    return this.http.get<any>(url);
   }
 
-  getReportsWeekly(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/reports/weekly`);
+  getReportsWeekly(deviceId?: number): Observable<any> {
+    const url = deviceId ? `${this.baseUrl}/reports/weekly?deviceId=${deviceId}` : `${this.baseUrl}/reports/weekly`;
+    return this.http.get<any>(url);
   }
 
-  getReportsMonthly(): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/reports/monthly`);
+  getReportsMonthly(deviceId?: number): Observable<any> {
+    const url = deviceId ? `${this.baseUrl}/reports/monthly?deviceId=${deviceId}` : `${this.baseUrl}/reports/monthly`;
+    return this.http.get<any>(url);
+  }
+
+  getReportsHistory(limit: number = 30, deviceId?: number): Observable<any[]> {
+    const url = deviceId ? `${this.baseUrl}/reports/history?limit=${limit}&deviceId=${deviceId}` : `${this.baseUrl}/reports/history?limit=${limit}`;
+    return this.http.get<any[]>(url);
+  }
+
+  getCSVExportUrl(from: string, to: string, type: string, deviceId?: number): string {
+    let url = `${this.baseUrl}/reports/export/csv?from=${from}&to=${to}&type=${type}`;
+    if (deviceId) {
+      url += `&deviceId=${deviceId}`;
+    }
+    return url;
   }
 }

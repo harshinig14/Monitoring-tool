@@ -1,29 +1,39 @@
 <div class="config-page-container">
-  <!-- Page Header -->
+  <!-- Page Header (Phase 8.10) -->
   <div class="page-hero-header">
     <div class="header-text-area">
       <h2 class="hero-title">System Configuration</h2>
-      <p class="hero-subtitle">Update agent core configurations and review hardware setups across active machine environments.</p>
+      <p class="hero-subtitle">Manage polling frequency and registered monitoring agents.</p>
     </div>
     <div class="header-action-area">
-      <button pButton type="button" icon="pi pi-plus" label="Add New Device" class="p-button-outlined add-device-btn" (click)="openAddDevice()"></button>
+      <button class="p-button p-button-outlined add-device-btn" (click)="openAddDevice()">
+        <i class="pi pi-plus" style="margin-right: 8px;"></i>
+        Add New Device
+      </button>
     </div>
   </div>
 
+  <!-- Row 1: Polling and Code Snippet side-by-side -->
   <div class="grid col-gap-4 row-gap-4">
-    <!-- Left Column: Polling Configuration & Add Device Panel -->
+    <!-- Left Column: Polling Configuration -->
     <div class="col-12 lg:col-6">
       <div class="config-card">
-        <h3 class="card-hero-title">Polling Configuration</h3>
-        <p class="card-subtitle">Adjust how frequently the active SysPulse monitors pulse hardware telemetry datasets back to the centralized analyzer hub.</p>
+        <div class="card-title-wrapper">
+          <i class="pi pi-check-square card-title-icon"></i>
+          <h3 class="card-hero-title">Polling Configuration</h3>
+        </div>
+        <p class="card-subtitle">Adjust how frequently agents send telemetry to the server.</p>
         
-        <div class="form-field-wrapper mt-4">
+        <div class="form-field-wrapper mt-5">
           <label class="input-field-label">Monitoring Frequency</label>
-          <p-select [options]="monitoringIntervals" [(ngModel)]="selectedInterval" optionLabel="label" optionValue="value" styleClass="w-full mt-2"></p-select>
+          <p-select [options]="monitoringIntervals" [(ngModel)]="selectedInterval" optionLabel="label" optionValue="value" styleClass="w-full mt-3 custom-dropdown-select"></p-select>
         </div>
 
         <div class="action-row-area mt-5">
-          <button pButton type="button" label="Save Configuration" icon="pi pi-save" class="p-button-cyan save-config-btn" (click)="saveConfig()"></button>
+          <button class="p-button p-button-outlined save-config-btn" (click)="saveConfig()">
+            <i class="pi pi-check-square" style="margin-right: 8px;"></i>
+            Save Configuration
+          </button>
           
           @if (saveSuccess) {
             <span class="success-toast-msg">
@@ -32,83 +42,25 @@
           }
         </div>
 
-        <p class="notice-footer-text mt-4">Applies Instantly to all active subatomic agents upon their next report interval.</p>
+        <p class="notice-footer-text mt-4">Applies on the agent's next report cycle.</p>
       </div>
-
-      <!-- Add Device Wizard Modal/Panel -->
-      @if (showAddDevicePanel) {
-        <div class="add-device-wizard-card mt-4">
-          <div class="wizard-header">
-            <h3 class="wizard-title"><i class="pi pi-plus-circle"></i> Add New Device</h3>
-            <button class="close-wizard-btn" (click)="showAddDevicePanel = false"><i class="pi pi-times"></i></button>
-          </div>
-          <p class="wizard-subtitle">Select the operating system of the machine you want to monitor to download the SysPulse agent installer.</p>
-          
-          <!-- OS Selector Deck -->
-          <div class="os-deck mt-3">
-            <div class="os-card" [class.active]="selectedOS === 'windows'" (click)="selectOS('windows')">
-              <i class="pi pi-microsoft os-card-icon win"></i>
-              <span class="os-card-label">Windows</span>
-            </div>
-            <div class="os-card" [class.active]="selectedOS === 'linux'" (click)="selectOS('linux')">
-              <i class="pi pi-circle-fill os-card-icon lin"></i>
-              <span class="os-card-label">Linux</span>
-            </div>
-            <div class="os-card" [class.active]="selectedOS === 'mac'" (click)="selectOS('mac')">
-              <i class="pi pi-apple os-card-icon mac"></i>
-              <span class="os-card-label">macOS</span>
-            </div>
-          </div>
-
-          <!-- Dynamic Instructions Box (PHASE 8.11) -->
-          @if (selectedOS) {
-            <div class="instructions-panel mt-4">
-              <h4 class="instructions-title"><i class="pi pi-info-circle"></i> Setup Guidance ({{ selectedOS | uppercase }})</h4>
-              <p class="download-alert-text"><i class="pi pi-check-circle"></i> Download started. Save the file and follow instructions below.</p>
-              
-              <div class="steps-wrapper mt-3">
-                @if (selectedOS === 'windows') {
-                  <ol class="step-list">
-                    <li>Double click on <strong>agent-windows.exe</strong>.</li>
-                    <li>Files are installed directly to: <code>C:\Program Files\SysPulse</code>.</li>
-                    <li>A background service is registered automatically to survive system reboots.</li>
-                    <li>The agent registers automatically and streams telemetry data.</li>
-                    <li>Your machine appears in the Connected Devices dashboard.</li>
-                  </ol>
-                } @else if (selectedOS === 'linux') {
-                  <ol class="step-list">
-                    <li>Open your terminal and navigate to download folder.</li>
-                    <li>Mark agent binary as executable: <br><code>chmod +x agent-linux</code></li>
-                    <li>Launch the agent process as root daemon: <br><code>sudo ./agent-linux</code></li>
-                    <li>Agent connects and displays in active summary.</li>
-                  </ol>
-                } @else if (selectedOS === 'mac') {
-                  <ol class="step-list">
-                    <li>Double click on downloaded <strong>agent-macos.pkg</strong> installer.</li>
-                    <li>Allow system security installation prompts.</li>
-                    <li>Complete the installer setup. LaunchDaemon executes background polling automatically.</li>
-                  </ol>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      }
     </div>
 
-    <!-- Right Column: Setup Guidance & Platforms -->
+    <!-- Right Column: Code Terminal Block -->
     <div class="col-12 lg:col-6">
-      <!-- Terminal Setup Code Block -->
       <div class="terminal-container">
         <div class="terminal-header">
-          <div class="dots">
-            <span class="dot red"></span>
-            <span class="dot yellow"></span>
-            <span class="dot green"></span>
+          <div class="dots-title-wrapper">
+            <div class="dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span class="title">agent_boot.go</span>
           </div>
-          <span class="title">agent_boot.go</span>
         </div>
         <pre class="code-terminal"><code><span class="keyword">if</span> runtime.GOOS == <span class="string">"windows"</span> &#123;
+    
     <span class="comment">// Install Windows agent packages</span>
     <span class="function">setupWindowsMonitor</span>()
 &#125;
@@ -117,46 +69,68 @@
     <span class="function">setupLinuxSystemDaemon</span>()
 &#125;</code></pre>
       </div>
-
-      <!-- Registered Platforms deck -->
-      <div class="registered-platforms-card mt-4">
-        <h4 class="platforms-title">Registered Monitoring Platforms</h4>
-        
-        <div class="platform-list mt-3">
-          <!-- Item 1: Windows -->
-          <div class="platform-item">
-            <div class="platform-left">
-              <i class="pi pi-microsoft platform-icon windows-color"></i>
-              <div class="platform-details">
-                <span class="platform-name">DESKTOP-PRO-01</span>
-                <span class="platform-meta">Platform: <span class="val">windows</span> | Status: <span class="val">ONLINE</span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 2: Linux -->
-          <div class="platform-item">
-            <div class="platform-left">
-              <i class="pi pi-circle-fill platform-icon linux-color"></i>
-              <div class="platform-details">
-                <span class="platform-name">LINUX-PROD-SERVER-01</span>
-                <span class="platform-meta">Platform: <span class="val">linux</span> | Status: <span class="val">ONLINE</span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Item 3: Apple macOS -->
-          <div class="platform-item">
-            <div class="platform-left">
-              <i class="pi pi-apple platform-icon mac-color"></i>
-              <div class="platform-details">
-                <span class="platform-name">MACBOOK-M3-DEVELOPMENT</span>
-                <span class="platform-meta">Platform: <span class="val">darwin</span> | Status: <span class="val">ONLINE</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
+
+
+  <!-- Row 3: Add New Device Wizard Modal/Panel (Inline at the bottom) -->
+  @if (showAddDevicePanel) {
+    <div id="add-device-wizard" class="add-device-wizard-card mt-4">
+      <div class="wizard-header">
+        <h3 class="wizard-title"><i class="pi pi-plus-circle"></i> Add New Device</h3>
+        <button class="close-wizard-btn" (click)="showAddDevicePanel = false"><i class="pi pi-times"></i></button>
+      </div>
+      <p class="wizard-subtitle">Select the operating system of the machine you want to monitor to download the SysPulse agent installer.</p>
+      
+      <!-- OS Selector Deck -->
+      <div class="os-deck mt-3">
+        <div class="os-card" [class.active]="selectedOS === 'windows'" (click)="selectOS('windows')">
+          <i class="pi pi-microsoft os-card-icon win"></i>
+          <span class="os-card-label">Windows</span>
+        </div>
+        <div class="os-card" [class.active]="selectedOS === 'linux'" (click)="selectOS('linux')">
+          <i class="pi pi-circle-fill os-card-icon lin"></i>
+          <span class="os-card-label">Linux</span>
+        </div>
+        <div class="os-card" [class.active]="selectedOS === 'mac'" (click)="selectOS('mac')">
+          <i class="pi pi-apple os-card-icon mac"></i>
+          <span class="os-card-label">macOS</span>
+        </div>
+      </div>
+
+      <!-- Dynamic Instructions Box -->
+      @if (selectedOS) {
+        <div class="instructions-panel mt-4">
+          <h4 class="instructions-title"><i class="pi pi-info-circle"></i> Setup Guidance ({{ selectedOS | uppercase }})</h4>
+          <p class="download-alert-text"><i class="pi pi-check-circle"></i> Download started. Save the file and follow instructions below.</p>
+          
+          <div class="steps-wrapper mt-3">
+            @if (selectedOS === 'windows') {
+              <ol class="step-list">
+                <li>Execute the downloaded installer <strong>agent-windows.exe</strong> on the target device.</li>
+                <li>During installation, all required files will be extracted to <code>C:\Program Files\SysPulse</code>.</li>
+                <li>The installer will automatically register and start the <strong>SysPulse Monitoring Service</strong>.</li>
+                <li>Once running, the agent automatically registers with the backend and begins streaming real-time statistics (CPU, Memory, Disk, Network).</li>
+                <li>Open the Admin Console to see the device status change to <strong>Online</strong>.</li>
+              </ol>
+            } @else if (selectedOS === 'linux') {
+              <ol class="step-list">
+                <li>Transfer the downloaded <strong>agent-linux</strong> binary to the target Linux machine.</li>
+                <li>Make it executable and extract to system path: <br><code>chmod +x agent-linux && sudo mv agent-linux /usr/local/bin/syspulse</code></li>
+                <li>Run installer command to register systemd service daemon automatically: <br><code>sudo /usr/local/bin/syspulse --install-service</code></li>
+                <li>The service will start automatically and immediately begin sending system statistics to the backend service.</li>
+              </ol>
+            } @else if (selectedOS === 'mac') {
+              <ol class="step-list">
+                <li>Double-click the downloaded <strong>agent-macos.pkg</strong> installer.</li>
+                <li>Follow the package installation steps to extract files to <code>/usr/local/share/syspulse</code>.</li>
+                <li>The installer automatically registers a LaunchDaemon service to run on startup.</li>
+                <li>The background agent service starts collecting and saving metrics immediately.</li>
+              </ol>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
 </div>

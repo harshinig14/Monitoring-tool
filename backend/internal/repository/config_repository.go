@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+	"log"
 )
 
 type ConfigRepository struct {
@@ -17,6 +18,7 @@ func (r *ConfigRepository) GetConfiguration() (int, error) {
 	query := `SELECT polling_frequency FROM configurations ORDER BY id DESC LIMIT 1`
 	err := r.DB.QueryRow(query).Scan(&frequency)
 	if err != nil {
+		log.Printf("GetConfiguration DB query error: %v", err)
 		return 60, nil // Default fallback is 60 seconds (also catches missing tables)
 	}
 	return frequency, nil

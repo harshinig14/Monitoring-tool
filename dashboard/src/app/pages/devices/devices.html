@@ -6,7 +6,10 @@
       <p class="hero-subtitle">Monitor hardware health status, OS profiles, status, and last report time signatures of all enrolled hosts.</p>
     </div>
     <div class="header-action-area">
-      <button pButton type="button" icon="pi pi-refresh" label="Refresh Grid" class="p-button-outlined p-button-cyan refresh-btn" (click)="fetchDevices()" [loading]="loading"></button>
+      <button class="p-button p-button-outlined p-button-cyan refresh-btn" (click)="fetchDevices()" [disabled]="loading">
+        <i class="pi" [class.pi-refresh]="!loading" [class.pi-spin]="loading" [class.pi-spinner]="loading" style="margin-right: 8px;"></i>
+        Refresh Grid
+      </button>
     </div>
   </div>
 
@@ -23,19 +26,20 @@
 
   <!-- PrimeNG Data Table -->
   <div class="table-card">
-    <p-table [value]="filteredDevices" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10,20,50]" responsiveLayout="scroll" styleClass="p-datatable-sm" (onRowSelect)="onRowSelect($event.data)">
+    <p-table [value]="filteredDevices" [paginator]="true" [rows]="10" responsiveLayout="scroll" styleClass="p-datatable-sm">
       <ng-template pTemplate="header">
         <tr>
           <th pSortableColumn="machine_name">Machine Name <p-sortIcon field="machine_name"></p-sortIcon></th>
           <th pSortableColumn="os_type">Operating System <p-sortIcon field="os_type"></p-sortIcon></th>
           <th pSortableColumn="status">Agent Status <p-sortIcon field="status"></p-sortIcon></th>
           <th pSortableColumn="last_seen">Last Seen / Pulsed <p-sortIcon field="last_seen"></p-sortIcon></th>
+          <th style="width: 240px; min-width: 240px;">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-device>
-        <tr (click)="onRowSelect(device)" [class.offline-row]="device.status === 'OFFLINE'">
+        <tr [class.offline-row]="device.status === 'OFFLINE'" [class.deactivated-row]="device.status === 'DEACTIVATED'">
           <!-- Machine Name -->
-          <td>
+          <td (click)="onRowSelect(device)">
             <div class="cell-machine">
               <i class="pi pi-server machine-icon"></i>
               <span class="machine-name-text">{{ device.machine_name }}</span>
@@ -43,7 +47,7 @@
           </td>
           
           <!-- OS Type -->
-          <td>
+          <td (click)="onRowSelect(device)">
             <div class="cell-os">
               <!-- Render OS-specific icons -->
               @if (device.os_type === 'windows') {
@@ -58,24 +62,108 @@
           </td>
           
           <!-- Agent Status -->
-          <td>
+          <td (click)="onRowSelect(device)">
             <div class="cell-status">
               @if (device.status === 'ONLINE') {
-                <span class="status-badge online-badge">ONLINE</span>
-              } @else if (device.status === 'PENDING') {
-                <span class="status-badge pending-badge">PENDING</span>
+                <span class="status-badge online-badge">Online</span>
+              } @else if (device.status === 'PENDING' || device.status === 'PENDING_REGISTRATION') {
+                <span class="status-badge pending-badge">Pending Registration</span>
+              } @else if (device.status === 'DEACTIVATED') {
+                <span class="status-badge deactivated-badge">Deactivated</span>
+              } @else if (device.status === 'REMOVED') {
+                <span class="status-badge removed-badge">Removed</span>
               } @else {
-                <span class="status-badge offline-badge">OFFLINE</span>
+                <span class="status-badge offline-badge">Offline</span>
               }
             </div>
           </td>
           
           <!-- Last Seen -->
-          <td>
+          <td (click)="onRowSelect(device)">
             <span class="last-seen-text">{{ device.last_seen }}</span>
+          </td>
+
+          <!-- Actions -->
+          <td style="width: 240px; min-width: 240px;">
+            <div class="actions-wrapper">
+               <!-- Activate -->
+              @if (device.status === 'DEACTIVATED') {
+                <button class="p-button p-button-sm p-button-success action-btn btn-slot-1" (click)="$event.stopPropagation(); activateDevice(device)">
+                  <i class="pi pi-play" style="margin-right: 4px;"></i>
+                  Activate
+                </button>
+              }
+              
+              <!-- Deactivate -->
+              @if (device.status === 'ONLINE' || device.status === 'OFFLINE') {
+                <button class="p-button p-button-sm p-button-secondary action-btn btn-slot-1" (click)="$event.stopPropagation(); deactivateDevice(device)">
+                  <i class="pi pi-pause" style="margin-right: 4px;"></i>
+                  Deactivate
+                </button>
+              }
+              
+              <!-- Remove -->
+              @if (device.status !== 'REMOVED') {
+                <button class="p-button p-button-sm p-button-danger action-btn btn-slot-2" (click)="$event.stopPropagation(); removeDevice(device)">
+                  <i class="pi pi-trash" style="margin-right: 4px;"></i>
+                  Remove
+                </button>
+              }
+
+              <!-- History -->
+              <button class="p-button p-button-sm p-button-outlined action-btn history-btn btn-slot-3" (click)="$event.stopPropagation(); viewHistory(device)" title="View status history">
+                <i class="pi pi-history"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </ng-template>
     </p-table>
   </div>
+
+  <!-- Device Status History Dialog Modal -->
+  @if (showHistoryModal) {
+    <div class="modal-overlay" (click)="closeHistoryModal()">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <div class="header-title-group">
+            <i class="pi pi-history history-modal-icon"></i>
+            <h3 class="modal-title">Device Audit History</h3>
+          </div>
+          <button class="close-modal-btn" (click)="closeHistoryModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-device-subtitle">Audit logs for device: <strong class="device-name-highlight">{{ selectedDeviceName }}</strong></p>
+          
+          @if (historyLoading) {
+            <div class="history-spinner-wrapper">
+              <i class="pi pi-spin pi-spinner spinner-icon"></i>
+              <span>Loading state transitions...</span>
+            </div>
+          } @else if (deviceHistory.length === 0) {
+            <div class="empty-history-wrapper">
+              <i class="pi pi-info-circle empty-history-icon"></i>
+              <span>No state transitions logged for this device yet.</span>
+            </div>
+          } @else {
+            <div class="history-timeline">
+              @for (log of deviceHistory; track log.changed_at) {
+                <div class="timeline-item">
+                  <div class="timeline-indicator"></div>
+                  <div class="timeline-content">
+                    <div class="timeline-transition-row">
+                      <span class="status-pill status-prev">{{ log.previous }}</span>
+                      <i class="pi pi-arrow-right timeline-arrow"></i>
+                      <span class="status-pill status-curr" [ngClass]="getStatusClass(log.current)">{{ log.current }}</span>
+                    </div>
+                    <span class="timeline-time">{{ formatHistoryTime(log.changed_at) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
 </div>

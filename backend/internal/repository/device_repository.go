@@ -22,12 +22,9 @@ func (r *DeviceRepository) GetAllDevices() ([]dto.DeviceResponse, error) {
 			machine_name,
 			os_type,
 			last_seen,
-			CASE
-				WHEN last_seen IS NULL THEN 'PENDING'
-				WHEN NOW() - last_seen < INTERVAL '60 seconds' THEN 'ONLINE'
-				ELSE 'OFFLINE'
-			END AS status
+			COALESCE(device_status, 'PENDING_REGISTRATION') AS status
 		FROM users
+		WHERE device_status IS NULL OR device_status != 'REMOVED'
 		ORDER BY machine_name
 	`
 
@@ -46,7 +43,7 @@ func (r *DeviceRepository) GetAllDevices() ([]dto.DeviceResponse, error) {
 			return nil, err
 		}
 		if lastSeen.Valid {
-			d.LastSeen = lastSeen.Time.Format(time.RFC3339)
+			d.LastSeen = toLocalTime(lastSeen.Time).Format(time.RFC3339)
 		} else {
 			d.LastSeen = ""
 		}
@@ -62,11 +59,7 @@ func (r *DeviceRepository) GetDeviceByID(id int) (*dto.DeviceResponse, error) {
 			machine_name,
 			os_type,
 			last_seen,
-			CASE
-				WHEN last_seen IS NULL THEN 'PENDING'
-				WHEN NOW() - last_seen < INTERVAL '60 seconds' THEN 'ONLINE'
-				ELSE 'OFFLINE'
-			END AS status
+			COALESCE(device_status, 'PENDING_REGISTRATION') AS status
 		FROM users
 		WHERE user_id = $1
 	`
@@ -81,9 +74,20 @@ func (r *DeviceRepository) GetDeviceByID(id int) (*dto.DeviceResponse, error) {
 		return nil, err
 	}
 	if lastSeen.Valid {
-		d.LastSeen = lastSeen.Time.Format(time.RFC3339)
+		d.LastSeen = toLocalTime(lastSeen.Time).Format(time.RFC3339)
 	} else {
 		d.LastSeen = ""
 	}
 	return &d, nil
+}
+
+func toLocalTime(t time.Time) time.Time {
+	if t.IsZero() {
+		return t
+	}
+	return time.Date(
+		t.Year(), t.Month(), t.Day(),
+		t.Hour(), t.Minute(), t.Second(),
+		t.Nanosecond(), time.Local,
+	)
 }

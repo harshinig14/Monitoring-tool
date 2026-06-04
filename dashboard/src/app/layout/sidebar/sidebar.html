@@ -16,7 +16,7 @@
       <i class="pi pi-desktop menu-icon"></i>
       <span class="menu-label">Connected Devices</span>
     </a>
-    <a routerLink="/realtime" routerLinkActive="active" class="menu-item">
+    <a [routerLink]="getRealtimeLink()" routerLinkActive="active" class="menu-item">
       <i class="pi pi-chart-line menu-icon"></i>
       <span class="menu-label">Real-Time Stats</span>
     </a>

@@ -28,6 +28,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ButtonModule } from 'primeng/button';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
 
 // Chart.js Module
 import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
@@ -61,6 +63,7 @@ import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2
     ButtonModule,
     ProgressBarModule,
     DatePickerModule,
+    ToastModule,
     
     // Charts Directive
     BaseChartDirective
@@ -72,7 +75,8 @@ import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2
         preset: Aura
       }
     }),
-    provideCharts(withDefaultRegisterables())
+    provideCharts(withDefaultRegisterables()),
+    MessageService
   ],
   bootstrap: [App],
 })

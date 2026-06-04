@@ -6,4 +6,12 @@ import { Component } from '@angular/core';
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
 })
-export class Sidebar {}
+export class Sidebar {
+  public getRealtimeLink(): any[] {
+    const savedId = localStorage.getItem('selectedDeviceId');
+    if (savedId) {
+      return ['/realtime', Number(savedId)];
+    }
+    return ['/realtime'];
+  }
+}

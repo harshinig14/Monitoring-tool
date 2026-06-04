@@ -2,8 +2,14 @@
   <!-- Page Hero Header -->
   <div class="page-hero-header">
     <div class="header-text-area">
-      <h2 class="hero-title">Historical Audit Reports</h2>
-      <p class="hero-subtitle">Sieve through hardware average graphs and export spreadsheets detailing systemic performance baselines.</p>
+      <h2 class="hero-title">Historical Audit Reports @if (selectedDeviceName) { - {{ selectedDeviceName }} }</h2>
+      <p class="hero-subtitle">
+        @if (selectedDeviceName) {
+          Sieve through hardware average graphs and export spreadsheets detailing systemic performance baselines for {{ selectedDeviceName }}.
+        } @else {
+          Sieve through hardware average graphs and export spreadsheets detailing systemic performance baselines.
+        }
+      </p>
     </div>
   </div>
 
@@ -55,7 +61,10 @@
       <h3 class="chart-title">
         @if (activeTab === 'daily') { Daily } @else if (activeTab === 'weekly') { Weekly } @else { Monthly } Consolidated Usage Trend
       </h3>
-      <button pButton type="button" icon="pi pi-download" label="Download CSV" class="p-button-outlined p-button-cyan csv-dl-btn" (click)="downloadCSV()"></button>
+      <button class="p-button p-button-outlined csv-dl-btn" (click)="downloadCSV()">
+        <i class="pi pi-download" style="margin-right: 8px;"></i>
+        Download CSV
+      </button>
     </div>
     
     <div class="chart-container-box mt-3">
@@ -98,4 +107,56 @@
       </p-table>
     </div>
   </div>
+
+  <!-- Glassmorphic Filter Dialog -->
+  @if (showFilterDialog) {
+    <div class="filter-dialog-backdrop">
+      <div class="filter-dialog-card">
+        <div class="dialog-header">
+          <h3 class="dialog-title">Export Report Filters</h3>
+          <button class="close-btn" (click)="showFilterDialog = false">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+        
+        <div class="dialog-body mt-3">
+          <div class="grid row-gap-3">
+            <!-- Date Range -->
+            <div class="col-12">
+              <label class="field-label">Date Range</label>
+              <div class="flex gap-2 mt-2">
+                <div class="flex-grow-1">
+                  <span class="sub-label">From Date</span>
+                  <input type="date" [(ngModel)]="filterFromDate" class="w-full mt-1 date-input">
+                </div>
+                <div class="flex-grow-1">
+                  <span class="sub-label">To Date</span>
+                  <input type="date" [(ngModel)]="filterToDate" class="w-full mt-1 date-input">
+                </div>
+              </div>
+            </div>
+ 
+            <!-- Statistics Type -->
+            <div class="col-12">
+              <label class="field-label">Statistics Type</label>
+              <select [(ngModel)]="filterStatsType" class="w-full mt-2 custom-select">
+                <option value="all">All Statistics (Consolidated)</option>
+                <option value="cpu">CPU Usage (%)</option>
+                <option value="memory">Memory Usage (%)</option>
+                <option value="disk">Disk Usage (%)</option>
+                <option value="network">Network Usage (MB/s)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="dialog-footer mt-4">
+          <button type="button" class="cancel-dialog-btn" (click)="showFilterDialog = false">Cancel</button>
+          <button type="button" class="export-confirm-btn" (click)="triggerFilteredDownload()">
+            <i class="pi pi-download mr-2"></i>Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  }
 </div>

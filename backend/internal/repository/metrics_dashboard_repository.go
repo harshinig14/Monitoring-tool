@@ -33,7 +33,7 @@ func (r *MetricsDashboardRepository) GetLatestMetrics(userID int) (*dto.Realtime
 		}
 		return nil, err
 	}
-	m.TraceDate = traceDate.Format(time.RFC3339)
+	m.TraceDate = toLocalTime(traceDate).Format(time.RFC3339)
 	return &m, nil
 }
 
@@ -74,7 +74,7 @@ func (r *MetricsDashboardRepository) queryMetricsList(query string, userID int) 
 		if err != nil {
 			return nil, err
 		}
-		m.TraceDate = traceDate.Format(time.RFC3339)
+		m.TraceDate = toLocalTime(traceDate).Format(time.RFC3339)
 		results = append(results, m)
 	}
 	return results, nil

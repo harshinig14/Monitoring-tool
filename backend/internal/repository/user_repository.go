@@ -51,3 +51,27 @@ func (r *UserRepository) CreateUser(username string, machineName string, osType 
 	}
 	return userID, nil
 }
+
+func (r *UserRepository) GetUserByID(userID int) (*User, error) {
+	var user User
+	var lastSeen sql.NullTime
+	query := `SELECT user_id, username, machine_name, os_type, last_seen, created_at FROM users WHERE user_id = $1`
+	err := r.DB.QueryRow(query, userID).Scan(
+		&user.UserID,
+		&user.Username,
+		&user.MachineName,
+		&user.OSType,
+		&lastSeen,
+		&user.CreatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, err
+	}
+	if lastSeen.Valid {
+		user.LastSeen = lastSeen.Time
+	}
+	return &user, nil
+}

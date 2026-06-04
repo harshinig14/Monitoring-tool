@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription, interval } from 'rxjs';
 import { ApiService } from '../../core/services/api.service';
 import { Device } from '../../core/models/device.model';
 import { MetricSet } from '../../core/models/metrics.model';
 import { ChartConfiguration, ChartDataset } from 'chart.js';
+import { WebsocketService } from '../../core/services/websocket.service';
 
 @Component({
   selector: 'app-realtime',
@@ -68,43 +69,81 @@ export class Realtime implements OnInit, OnDestroy {
   };
 
   private routeSub!: Subscription;
-  private pollSub!: Subscription;
+  private wsSub!: Subscription;
+  private mockIntervalSub: Subscription | null = null;
   private isMockMode: boolean = false;
 
   constructor(
     private route: ActivatedRoute,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private wsService: WebsocketService,
+    private cdr: ChangeDetectorRef
   ) {}
+
+  private logDebug(message: string, data?: any): void {
+    console.log(message, data);
+    this.apiService.postDebugLog(message, data || {}).subscribe({
+      error: () => {}
+    });
+  }
 
   ngOnInit(): void {
     this.routeSub = this.route.params.subscribe(params => {
       if (params['userId']) {
         this.userId = Number(params['userId']);
-        this.loadDeviceDetails();
-        this.loadMetricsHistory();
-        
-        // Setup polling every 10 seconds
-        if (this.pollSub) this.pollSub.unsubscribe();
-        this.pollSub = interval(10000).subscribe(() => {
-          this.pollLatestMetrics();
-        });
       } else {
-        // Default to first user if none provided
-        this.userId = 1;
-        this.loadDeviceDetails();
-        this.loadMetricsHistory();
-        
-        if (this.pollSub) this.pollSub.unsubscribe();
-        this.pollSub = interval(10000).subscribe(() => {
-          this.pollLatestMetrics();
-        });
+        const savedId = localStorage.getItem('selectedDeviceId');
+        this.userId = savedId ? Number(savedId) : 1;
+      }
+      localStorage.setItem('selectedDeviceId', this.userId.toString());
+      this.logDebug('Realtime component initialized for userId: ' + this.userId);
+      this.loadDeviceDetails();
+      this.loadMetricsHistory();
+    });
+
+    // Subscribe to WebSocket messages
+    this.wsSub = this.wsService.getMessages().subscribe(msg => {
+      if (msg) {
+        if (msg.type === 'metric' && Number(msg.user_id) === this.userId) {
+          // Live data arrived! Stop mock data tick if it is running
+          if (this.isMockMode) {
+            this.isMockMode = false;
+            this.stopMockInterval();
+          }
+
+          this.cpuUsage = Math.round(msg.cpu);
+          this.memoryUsage = Math.round(msg.memory);
+          this.diskUsage = Math.round(msg.disk);
+          this.networkUsage = Number((msg.network / (1024 * 1024)).toFixed(1));
+
+          const metricsPayload: MetricSet = {
+            cpu_usage: msg.cpu,
+            memory_usage: msg.memory,
+            disk_usage: msg.disk,
+            network_usage: msg.network,
+            trace_date: new Date().toISOString()
+          };
+          if (this.activeTab === '5m') {
+            this.appendLatestToChart(metricsPayload);
+          }
+          this.cdr.detectChanges();
+        } else if (msg.type === 'device_status' && Number(msg.user_id) === this.userId) {
+          if (this.device) {
+            this.device.status = (msg.status || '').toUpperCase();
+            if (msg.status === 'OFFLINE') {
+              this.stopMockInterval();
+            }
+            this.cdr.detectChanges();
+          }
+        }
       }
     });
   }
 
   ngOnDestroy(): void {
     if (this.routeSub) this.routeSub.unsubscribe();
-    if (this.pollSub) this.pollSub.unsubscribe();
+    if (this.wsSub) this.wsSub.unsubscribe();
+    this.stopMockInterval();
   }
 
   public changeTab(tab: string): void {
@@ -114,17 +153,23 @@ export class Realtime implements OnInit, OnDestroy {
 
   private loadDeviceDetails(): void {
     if (this.userId === null) return;
+    this.logDebug('loadDeviceDetails starting for userId: ' + this.userId);
     
     this.apiService.getDeviceById(this.userId).subscribe({
       next: (dev) => {
+        this.logDebug('loadDeviceDetails next: ', dev);
         if (dev) {
-          this.device = { ...dev, status: dev.status.toUpperCase() };
+          this.device = { ...dev, status: (dev.status || '').toUpperCase() };
+          this.logDebug('loadDeviceDetails device set to: ', this.device);
         } else {
           this.setupMockDevice();
         }
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        this.logDebug('loadDeviceDetails error: ', { message: err.message, status: err.status });
         this.setupMockDevice();
+        this.cdr.detectChanges();
       }
     });
   }
@@ -139,10 +184,12 @@ export class Realtime implements OnInit, OnDestroy {
       5: { user_id: 5, machine_name: 'HR-LAPTOP-05', os_type: 'windows', status: 'ONLINE', last_seen: 'Just now' }
     };
     this.device = mockDevices[this.userId!] || mockDevices[1];
+    this.logDebug('setupMockDevice done: ', this.device);
   }
 
   private loadMetricsHistory(): void {
     if (this.userId === null) return;
+    this.logDebug('loadMetricsHistory starting for userId: ' + this.userId + ', tab: ' + this.activeTab);
     
     // Call proper endpoint depending on active tab
     const history$ = this.activeTab === '24h' 
@@ -151,57 +198,85 @@ export class Realtime implements OnInit, OnDestroy {
 
     history$.subscribe({
       next: (data) => {
+        this.logDebug('loadMetricsHistory success: length = ' + (data ? data.length : 0));
         if (data && data.length > 0) {
           this.isMockMode = false;
+          this.stopMockInterval();
           this.populateChartData(data);
         } else {
           this.generateMockHistory();
+          this.startMockInterval();
         }
+        this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        this.logDebug('loadMetricsHistory error: ', { message: err.message, status: err.status });
         this.generateMockHistory();
+        this.startMockInterval();
+        this.cdr.detectChanges();
       }
     });
   }
 
-  private pollLatestMetrics(): void {
-    if (this.userId === null || this.device?.status === 'OFFLINE') return;
-
-    this.apiService.getRealtimeMetrics(this.userId).subscribe({
-      next: (metrics) => {
-        if (metrics) {
-          this.cpuUsage = Math.round(metrics.cpu_usage);
-          this.memoryUsage = Math.round(metrics.memory_usage);
-          this.diskUsage = Math.round(metrics.disk_usage);
-          this.networkUsage = Number(metrics.network_usage.toFixed(1));
-          
-          this.appendLatestToChart(metrics);
-        } else {
-          this.tickMockMetrics();
-        }
-      },
-      error: () => {
-        this.tickMockMetrics();
-      }
+  private startMockInterval(): void {
+    if (this.mockIntervalSub) return;
+    this.mockIntervalSub = interval(5000).subscribe(() => {
+      this.tickMockMetrics();
     });
+  }
+
+  private stopMockInterval(): void {
+    if (this.mockIntervalSub) {
+      this.mockIntervalSub.unsubscribe();
+      this.mockIntervalSub = null;
+    }
+  }
+
+  private downsample(list: MetricSet[], targetSize: number): MetricSet[] {
+    if (list.length <= targetSize) {
+      return list;
+    }
+    const result: MetricSet[] = [];
+    const step = (list.length - 1) / (targetSize - 1);
+    for (let i = 0; i < targetSize; i++) {
+      const index = Math.round(i * step);
+      result.push(list[index]);
+    }
+    return result;
   }
 
   private populateChartData(metricsList: MetricSet[]): void {
+    if (!metricsList || metricsList.length === 0) return;
+
+    let cleanList: MetricSet[] = [];
+
+    if (this.activeTab === '5m') {
+      // Filter to only include metrics from the last 5 minutes relative to the latest data point
+      const latestDate = new Date(metricsList[metricsList.length - 1].trace_date);
+      const fiveMinutesAgo = new Date(latestDate.getTime() - 5 * 60 * 1000);
+      const filtered = metricsList.filter(m => new Date(m.trace_date) >= fiveMinutesAgo);
+      // Downsample to 30 points if we have more
+      cleanList = this.downsample(filtered, 30);
+    } else if (this.activeTab === '1h') {
+      // Downsample the entire 1-hour metrics list to 30 points
+      cleanList = this.downsample(metricsList, 30);
+    } else {
+      // Downsample the entire 24-hour metrics list to 30 points
+      cleanList = this.downsample(metricsList, 30);
+    }
+
     const labels: string[] = [];
     const cpu: number[] = [];
     const mem: number[] = [];
     const disk: number[] = [];
     const net: number[] = [];
 
-    // Limit to last 30 data points for UI aesthetic clean layout
-    const cleanList = metricsList.slice(-30);
-
     cleanList.forEach(m => {
       labels.push(this.formatTimeLabel(m.trace_date));
       cpu.push(m.cpu_usage);
       mem.push(m.memory_usage);
       disk.push(m.disk_usage);
-      net.push(m.network_usage);
+      net.push(Number((m.network_usage / (1024 * 1024)).toFixed(2)));
     });
 
     this.chartLabels = labels;
@@ -210,14 +285,12 @@ export class Realtime implements OnInit, OnDestroy {
     this.diskDatasets[0].data = disk;
     this.networkDatasets[0].data = net;
     
-    // Set current values to latest
-    if (cleanList.length > 0) {
-      const latest = cleanList[cleanList.length - 1];
-      this.cpuUsage = Math.round(latest.cpu_usage);
-      this.memoryUsage = Math.round(latest.memory_usage);
-      this.diskUsage = Math.round(latest.disk_usage);
-      this.networkUsage = Number(latest.network_usage.toFixed(1));
-    }
+    // Set current values to latest raw point from metricsList
+    const latest = metricsList[metricsList.length - 1];
+    this.cpuUsage = Math.round(latest.cpu_usage);
+    this.memoryUsage = Math.round(latest.memory_usage);
+    this.diskUsage = Math.round(latest.disk_usage);
+    this.networkUsage = Number((latest.network_usage / (1024 * 1024)).toFixed(1));
   }
 
   private appendLatestToChart(m: MetricSet): void {
@@ -236,7 +309,7 @@ export class Realtime implements OnInit, OnDestroy {
     this.cpuDatasets[0].data!.push(m.cpu_usage);
     this.memoryDatasets[0].data!.push(m.memory_usage);
     this.diskDatasets[0].data!.push(m.disk_usage);
-    this.networkDatasets[0].data!.push(m.network_usage);
+    this.networkDatasets[0].data!.push(Number((m.network_usage / (1024 * 1024)).toFixed(2)));
     
     // Refresh charts
     this.chartLabels = [...this.chartLabels];
@@ -246,6 +319,9 @@ export class Realtime implements OnInit, OnDestroy {
     try {
       const date = new Date(dateStr);
       if (isNaN(date.getTime())) return dateStr;
+      if (this.activeTab === '24h') {
+        return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+      }
       return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
     } catch {
       return dateStr;

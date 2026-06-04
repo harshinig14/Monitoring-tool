@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ChartConfiguration, ChartDataset } from 'chart.js';
 import { ApiService } from '../../core/services/api.service';
 interface ReportLog {
@@ -18,6 +18,9 @@ interface ReportLog {
 export class Reports implements OnInit {
   public activeTab: string = 'daily'; // 'daily', 'weekly', 'monthly'
   
+  public selectedDeviceId: number | null = null;
+  public selectedDeviceName: string = '';
+
   // Averaged stats shown in cards
   public avgCpu: number = 46;
   public avgMem: number = 62;
@@ -65,10 +68,33 @@ export class Reports implements OnInit {
 
   public currentLogs: ReportLog[] = [];
 
-  constructor(private apiService: ApiService) {}
+  // Filter dialog UI states
+  public showFilterDialog: boolean = false;
+  public filterFromDate: string = '';
+  public filterToDate: string = '';
+  public filterStatsType: string = 'all';
+
+  constructor(private apiService: ApiService, private cdr: ChangeDetectorRef) {}
 
   ngOnInit(): void {
-    this.loadReportData();
+    const savedId = localStorage.getItem('selectedDeviceId');
+    if (savedId) {
+      this.selectedDeviceId = Number(savedId);
+      this.apiService.getDeviceById(this.selectedDeviceId).subscribe({
+        next: (dev) => {
+          if (dev) {
+            this.selectedDeviceName = dev.machine_name;
+            this.cdr.detectChanges();
+          }
+        },
+        error: (err) => console.error('Failed to load selected device info:', err)
+      });
+    }
+
+    // Wrap initial fetch in setTimeout to push execution to next turn, preventing NG0100
+    setTimeout(() => {
+      this.loadReportData();
+    }, 0);
   }
 
   public changeTab(tab: string): void {
@@ -78,33 +104,37 @@ export class Reports implements OnInit {
 
   private loadReportData(): void {
     let report$;
+    const devId = this.selectedDeviceId || undefined;
     if (this.activeTab === 'daily') {
-      report$ = this.apiService.getReportsDaily();
+      report$ = this.apiService.getReportsDaily(devId);
     } else if (this.activeTab === 'weekly') {
-      report$ = this.apiService.getReportsWeekly();
+      report$ = this.apiService.getReportsWeekly(devId);
     } else {
-      report$ = this.apiService.getReportsMonthly();
+      report$ = this.apiService.getReportsMonthly(devId);
     }
 
     report$.subscribe({
       next: (res) => {
-        if (res) {
-          this.avgCpu = res.avgCpu;
-          this.avgMem = res.avgMem;
-          this.avgDisk = res.avgDisk;
-          this.avgNet = res.avgNet;
-          this.chartLabels = res.chartLabels;
-          
-          this.chartDatasets[0].data = res.cpuData;
-          this.chartDatasets[1].data = res.memoryData;
-          this.chartDatasets[2].data = res.diskData;
-          this.chartDatasets[3].data = res.networkData;
-          
-          this.currentLogs = res.logs;
-          
-          // Trigger chart update
-          this.chartLabels = [...this.chartLabels];
-        }
+        setTimeout(() => {
+          if (res) {
+            this.avgCpu = res.avgCpu;
+            this.avgMem = res.avgMem;
+            this.avgDisk = res.avgDisk;
+            this.avgNet = res.avgNet;
+            this.chartLabels = res.chartLabels;
+            
+            this.chartDatasets[0].data = res.cpuData;
+            this.chartDatasets[1].data = res.memoryData;
+            this.chartDatasets[2].data = res.diskData;
+            this.chartDatasets[3].data = res.networkData;
+            
+            this.currentLogs = res.logs;
+            
+            // Trigger chart update
+            this.chartLabels = [...this.chartLabels];
+            this.cdr.detectChanges();
+          }
+        }, 0);
       },
       error: (err) => {
         console.error('Failed to load reports from backend:', err);
@@ -113,19 +143,23 @@ export class Reports implements OnInit {
   }
 
   public downloadCSV(): void {
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += 'Period,Avg CPU,Avg Memory,Avg Disk,Avg Network\r\n';
-    
-    this.currentLogs.forEach(row => {
-      csvContent += `"${row.period}","${row.avgCpu}","${row.avgMem}","${row.avgDisk}","${row.avgNet}"\r\n`;
-    });
+    const today = new Date();
+    const lastWeek = new Date();
+    lastWeek.setDate(today.getDate() - 7);
+    this.filterToDate = today.toISOString().split('T')[0];
+    this.filterFromDate = lastWeek.toISOString().split('T')[0];
+    this.showFilterDialog = true;
+  }
 
-    const encodedUri = encodeURI(csvContent);
+  public triggerFilteredDownload(): void {
+    const devId = this.selectedDeviceId || undefined;
+    const url = this.apiService.getCSVExportUrl(this.filterFromDate, this.filterToDate, this.filterStatsType, devId);
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `SysPulse_${this.activeTab}_report.csv`);
+    link.href = url;
+    link.download = `SysPulse_${this.filterStatsType}_report.csv`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    this.showFilterDialog = false;
   }
 }
